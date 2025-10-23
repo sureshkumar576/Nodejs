@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Job Application Tracker</title>
+
+  <!-- ===== CSS STYLE ===== -->
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --primary: #2563eb;
+      --text: #222;
+      --light: #fff;
+      --gray: #6b7280;
+      --border: #e5e7eb;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: "Segoe UI", Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      padding: 20px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--light);
+      padding: 12px 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+
+    header h1 {
+      font-size: 20px;
+      color: var(--primary);
+    }
+
+    button {
+      background: var(--primary);
+      color: var(--light);
+      border: none;
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.2s ease;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .ghost {
+      background: transparent;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--light);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+
+    label {
+      font-weight: 500;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 800px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .job-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .job-info h3 {
+      margin-bottom: 4px;
+    }
+
+    .meta {
+      color: var(--gray);
+      font-size: 13px;
+    }
+
+    .job-actions button {
+      margin-left: 6px;
+    }
+
+    .alert {
+      background: #e0f2fe;
+      color: #0369a1;
+      padding: 8px 10px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 13px;
+      color: var(--gray);
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>Job Application Tracker</h1>
+      <div id="nav"></div>
+    </header>
+
+    <div id="alertBox"></div>
+
+    <!-- === AUTH SECTION === -->
+    <div id="authSection" class="card">
+      <div>
+        <button id="loginTab">Login</button>
+        <button id="signupTab" class="ghost">Sign Up</button>
+      </div>
+
+      <form id="loginForm" class="card" style="margin-top:12px;">
+        <h3>Login</h3>
+        <input id="loginEmail" type="email" placeholder="Email" required />
+        <input id="loginPassword" type="password" placeholder="Password" required />
+        <button type="submit">Login</button>
+      </form>
+
+      <form id="signupForm" class="card hidden" style="margin-top:12px;">
+        <h3>Sign Up</h3>
+        <input id="signupName" placeholder="Full name" required />
+        <input id="signupEmail" type="email" placeholder="Email" required />
+        <input id="signupPassword" type="password" placeholder="Password" required />
+        <button type="submit">Create Account</button>
+      </form>
+    </div>
+
+    <!-- === MAIN APP === -->
+    <div id="appSection" class="hidden">
+      <div class="grid">
+        <div>
+          <div class="card">
+            <div class="search-row">
+              <input id="searchInput" placeholder="Search by company or role..." />
+              <select id="filterSelect">
+                <option value="">All</option>
+                <option>Applied</option>
+                <option>Interview</option>
+                <option>Offer</option>
+                <option>Rejected</option>
+              </select>
+            </div>
+            <div id="jobsList"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <h3>Add / Edit Job</h3>
+            <form id="jobForm">
+              <label>Company</label>
+              <input id="company" required />
+              <label>Role</label>
+              <input id="role" required />
+              <label>Status</label>
+              <select id="status">
+                <option>Applied</option>
+                <option>Interview</option>
+                <option>Offer</option>
+                <option>Rejected</option>
+              </select>
+              <label>Deadline</label>
+              <input id="deadline" type="date" />
+              <label>Notes</label>
+              <textarea id="notes" rows="3"></textarea>
+              <button type="submit">Save Job</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>Developed for Phase 5 – Job Application Tracker Project</footer>
+  </div>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+    const API_BASE = ''; // same-origin; backend serves static files
+
+    const $ = (id) => document.getElementById(id);
+    const alertBox = $('alertBox');
+
+    function showAlert(msg) {
+      alertBox.innerHTML = '<div class="alert">' + msg + '</div>';
+      setTimeout(() => alertBox.innerHTML = '', 2500);
+    }
+
+    // Auth switching
+    $('loginTab').onclick = () => {
+      $('loginForm').classList.remove('hidden');
+      $('signupForm').classList.add('hidden');
+    };
+    $('signupTab').onclick = () => {
+      $('signupForm').classList.remove('hidden');
+      $('loginForm').classList.add('hidden');
+    };
+
+    // Auth forms
+    $('signupForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const data = {
+        username: $('signupName').value,
+        email: $('signupEmail').value,
+        password: $('signupPassword').value
+      };
+      const res = await fetch(API_BASE + '/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (res.ok) showAlert('Account created! Please log in.');
+      else showAlert('Signup failed');
+    };
+
+    $('loginForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const data = {
+        email: $('loginEmail').value,
+        password: $('loginPassword').value
+      };
+      const res = await fetch(API_BASE + '/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const json = await res.json();
+      if (res.ok) {
+        localStorage.setItem('token', json.token);
+        localStorage.setItem('username', json.username);
+        showMainApp();
+        showAlert('Logged in!');
+      } else showAlert('Invalid credentials');
+    };
+
+    function logout() {
+      localStorage.clear();
+      $('authSection').classList.remove('hidden');
+      $('appSection').classList.add('hidden');
+      $('nav').innerHTML = '';
+    }
+
+    function showMainApp() {
+      $('authSection').classList.add('hidden');
+      $('appSection').classList.remove('hidden');
+      $('nav').innerHTML = `
+        <span>Hi, ${localStorage.getItem('username') || 'User'}</span>
+        <button onclick="logout()">Logout</button>
+      `;
+      loadJobs();
+    }
+
+    // Job CRUD
+    async function loadJobs() {
+      const token = localStorage.getItem('token');
+      const res = await fetch(API_BASE + '/jobs', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const data = await res.json();
+      renderJobs(data.jobs || []);
+    }
+
+    function renderJobs(jobs) {
+      const list = $('jobsList');
+      const q = $('searchInput').value.toLowerCase();
+      const f = $('filterSelect').value;
+      const filtered = jobs.filter(j => {
+        const matchText = (j.company + j.role).toLowerCase().includes(q);
+        const matchStatus = f ? j.status === f : true;
+        return matchText && matchStatus;
+      });
+      list.innerHTML = filtered.length ? filtered.map(jobToHtml).join('') : '<p>No jobs found</p>';
+    }
+
+    function jobToHtml(j) {
+      return `
+      <div class="job-item">
+        <div class="job-info">
+          <h3>${j.company}</h3>
+          <p class="meta">${j.role} • ${j.status}</p>
+        </div>
+        <div class="job-actions">
+          <button onclick="editJob('${j._id}')">Edit</button>
+          <button class="ghost" onclick="deleteJob('${j._id}')">Delete</button>
+        </div>
+      </div>`;
+    }
+
+    $('jobForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const token = localStorage.getItem('token');
+      const body = {
+        company: $('company').value,
+        role: $('role').value,
+        status: $('status').value,
+        deadline: $('deadline').value,
+        notes: $('notes').value
+      };
+      const res = await fetch(API_BASE + '/jobs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify(body)
+      });
+      if (res.ok) {
+        showAlert('Job saved!');
+        $('jobForm').reset();
+        loadJobs();
+      } else showAlert('Error saving job');
+    };
+
+    async function deleteJob(id) {
+      const token = localStorage.getItem('token');
+      if (!confirm('Delete this job?')) return;
+      const res = await fetch(API_BASE + '/jobs/' + id, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      if (res.ok) { showAlert('Job deleted'); loadJobs(); }
+    }
+
+    function editJob(id) {
+      showAlert('Edit function can be implemented similarly using PUT /jobs/:id');
+    }
+
+    // Auto-login check
+    window.addEventListener('load', () => {
+      if (localStorage.getItem('token')) showMainApp();
+    });
+  </script>
+</body>
+</html>
